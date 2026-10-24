@@ -23,7 +23,8 @@
   "pnpm": {
     "overrides": {
       "gray-matter>js-yaml": "3.15.2",
-      "blume>js-yaml": "4.3.2"
+      "blume>js-yaml": "4.3.2",
+      "@astrojs/internal-helpers>js-yaml": "4.3.2"
     }
   },
   "dependencies": {
