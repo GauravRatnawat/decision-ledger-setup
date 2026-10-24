@@ -1,0 +1,83 @@
+---
+import LedgerPage from "../../../src/components/LedgerPage.astro";
+import MoveNotice from "../../../src/components/MoveNotice.astro";
+import ProjectRail from "../../../src/components/ProjectRail.astro";
+import SearchLauncher from "../../../src/components/SearchLauncher.astro";
+import { dateLabel, manifest } from "../../../src/lib/journal";
+
+export function getStaticPaths() {
+  return manifest.projects.map((project) => ({
+    params: { project: project.name },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const sessions = manifest.entries
+  .filter((entry) => entry.project === project.name && entry.type === "session")
+  .sort((a, b) => (b.metadata.date ?? "").localeCompare(a.metadata.date ?? ""));
+const commits = manifest.entries
+  .filter((entry) => entry.project === project.name && entry.type === "commit")
+  .sort((a, b) => (b.metadata.date ?? "").localeCompare(a.metadata.date ?? ""));
+const sourceIndex = manifest.entries.find(
+  (entry) => entry.project === project.name && entry.type === "project-index",
+);
+---
+
+<LedgerPage title={`${project.name} · Decision Ledger`} route={`/projects/${project.name}`}>
+  <div class="ledger-shell">
+    <ProjectRail projects={manifest.projects} active={project.name} />
+    <main class="ledger-main inner-page">
+      <MoveNotice />
+      <header class="project-hero">
+        <div>
+          <p class="eyebrow">Project ledger / last active {dateLabel(project.lastActivity)}</p>
+          <h1>{project.name}</h1>
+          <p>{project.sessionCount} session records, backed by {project.commitCount} commit journals.</p>
+        </div>
+        {sourceIndex && <a class="source-link" href={sourceIndex.route}>Read source index ↗</a>}
+      </header>
+      <SearchLauncher compact />
+
+      <section class="ledger-section">
+        <div class="section-heading">
+          <div><p class="eyebrow">Primary record</p><h2>Sessions</h2></div>
+          <span>{sessions.length}</span>
+        </div>
+        <div class="session-list compact-list">
+          {
+            sessions.map((entry, index) => (
+              <a class="session-row" href={entry.route}>
+                <span class="row-number">{String(index + 1).padStart(2, "0")}</span>
+                <span class="row-content">
+                  <span class="row-meta"><time>{dateLabel(entry.metadata.date)}</time></span>
+                  <strong>{entry.title}</strong>
+                </span>
+                <span class="row-arrow" aria-hidden="true">↗</span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      {
+        commits.length > 0 && (
+          <details class="commit-drawer">
+            <summary>
+              <span><b>Supporting commit journals</b><small>Granular implementation evidence</small></span>
+              <strong>{commits.length}</strong>
+            </summary>
+            <div>
+              {commits.map((entry) => (
+                <a href={entry.route}>
+                  <time>{dateLabel(entry.metadata.date)}</time>
+                  <span>{entry.title}</span>
+                </a>
+              ))}
+            </div>
+          </details>
+        )
+      }
+    </main>
+  </div>
+</LedgerPage>

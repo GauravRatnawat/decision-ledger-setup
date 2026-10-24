@@ -1,0 +1,32 @@
+name: Check setup with fake journals
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Get setup source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Set pnpm
+        uses: pnpm/action-setup@a8198c4bff370c8506180b035930dea56dbd5288 # v5
+        with:
+          version: 10.34.5
+          run_install: false
+      - name: Set Node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22.12.0
+      - name: Install locked deps
+        run: pnpm install --frozen-lockfile
+      - name: Test setup
+        run: pnpm test
+      - name: Test private runner template
+        run: node --test templates/private/tests/site.test.mjs
+      - name: Check fake site
+        run: pnpm check
+      - name: Build fake site
+        run: pnpm build

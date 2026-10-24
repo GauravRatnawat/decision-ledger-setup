@@ -1,0 +1,32 @@
+---
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+
+<button
+  class:list={["ledger-search-launcher", { compact }]}
+  data-ledger-search
+  type="button"
+  aria-keyshortcuts="Meta+K Control+K"
+>
+  <span class="search-mark" aria-hidden="true">⌕</span>
+  <span class="search-copy">
+    <strong>Search every journal</strong>
+    {!compact && <small>sessions, decisions, evidence, and commits</small>}
+  </span>
+  <kbd>⌘ K</kbd>
+</button>
+
+<script>
+  document.addEventListener("click", (event) => {
+    const target = event.target as Element | null;
+    if (!target?.closest("[data-ledger-search]")) return;
+    const trigger = document.querySelector<HTMLButtonElement>(
+      "[data-blume-search-open]",
+    );
+    trigger?.click();
+  });
+</script>

@@ -1,0 +1,124 @@
+---
+import LedgerPage from "../src/components/LedgerPage.astro";
+import ProjectRail from "../src/components/ProjectRail.astro";
+import SearchLauncher from "../src/components/SearchLauncher.astro";
+import { dateLabel, manifest, recentSessions } from "../src/lib/journal";
+
+const recent = recentSessions.slice(0, 12);
+const actions = manifest.actionItems.slice(0, 8);
+const entryCount = manifest.entries.filter((entry) => entry.type !== "project-index").length;
+const excerpt = (body: string) =>
+  body
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/[#>*_`\[\]()|-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 180);
+---
+
+<LedgerPage
+  title="Decision Ledger"
+  description="A private, searchable record of engineering decisions and evidence."
+  route="/"
+>
+  <div class="ledger-shell">
+    <ProjectRail projects={manifest.projects} />
+    <main class="ledger-main">
+      <header class="dashboard-hero">
+        <div>
+          <p class="eyebrow">Private engineering memory</p>
+          <h1>Find the decision.<br /><em>Recover the why.</em></h1>
+          <p class="hero-copy">
+            {entryCount.toLocaleString("en")} records from {manifest.projects.length} projects,
+            kept as Markdown and made immediately searchable.
+          </p>
+        </div>
+        <div class="edition-mark" aria-hidden="true">
+          <span>Edition</span>
+          <strong>2026</strong>
+          <small>Personal / private</small>
+        </div>
+      </header>
+
+      <SearchLauncher />
+
+      <section class="ledger-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Latest evidence</p>
+            <h2>Recent sessions</h2>
+          </div>
+          <span>{recent.length} shown</span>
+        </div>
+        <div class="session-list">
+          {
+            recent.map((entry, index) => (
+              <a class="session-row" href={entry.route}>
+                <span class="row-number">{String(index + 1).padStart(2, "0")}</span>
+                <span class="row-content">
+                  <span class="row-meta">
+                    <b>{entry.project}</b>
+                    <time>{dateLabel(entry.metadata.date)}</time>
+                  </span>
+                  <strong>{entry.title}</strong>
+                  <small>{excerpt(entry.body)}</small>
+                </span>
+                <span class="row-arrow" aria-hidden="true">↗</span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      <div class="dashboard-grid">
+        <section class="ledger-section action-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Open loops</p>
+              <h2>Action items</h2>
+            </div>
+            <span>{manifest.actionItems.length} total</span>
+          </div>
+          {
+            actions.length ? (
+              <ol class="action-list">
+                {actions.map((action) => (
+                  <li>
+                    <a href={action.route}>{action.text}</a>
+                    <span>{action.project} · {dateLabel(action.date)}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p class="empty-copy">No unchecked Markdown tasks found.</p>
+            )
+          }
+        </section>
+
+        <section class="ledger-section project-field">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Active territories</p>
+              <h2>Projects</h2>
+            </div>
+            <a href="/projects">View all</a>
+          </div>
+          <div class="project-cards">
+            {
+              [...manifest.projects]
+                .sort((a, b) => (b.lastActivity ?? "").localeCompare(a.lastActivity ?? ""))
+                .slice(0, 8)
+                .map((project) => (
+                  <a href={`/projects/${project.name}`}>
+                    <strong>{project.name}</strong>
+                    <span>{project.sessionCount} sessions</span>
+                    <small>{dateLabel(project.lastActivity)}</small>
+                  </a>
+                ))
+            }
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</LedgerPage>

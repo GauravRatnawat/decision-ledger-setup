@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/YOUR_ACCOUNT/decision-ledger-setup.git",
+  "revision": "REPLACE_WITH_FULL_40_CHAR_SETUP_COMMIT_SHA",
+  "siteUrl": "https://journal.example.com",
+  "journalRepository": "YOUR_ACCOUNT/private-journals",
+  "journalBranch": "master",
+  "pagesProject": "private-journal"
+}

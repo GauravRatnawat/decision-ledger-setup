@@ -1,0 +1,39 @@
+{
+  "name": "decision-ledger-setup",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "blume build",
+    "check": "blume check --strict",
+    "dev": "blume dev",
+    "generate:content": "tsx scripts/generate-content.ts",
+    "prebuild": "pnpm generate:content",
+    "precheck": "pnpm generate:content",
+    "predev": "pnpm generate:content",
+    "preview": "blume preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate": "blume validate"
+  },
+  "dependencies": {
+    "@fontsource-variable/newsreader": "^5.3.0",
+    "@fontsource-variable/spline-sans": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "blume": "1.2.0",
+    "gray-matter": "^4.0.3",
+    "jose": "6.2.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "astro": "7.1.6",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}

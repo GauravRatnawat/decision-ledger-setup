@@ -1,0 +1,33 @@
+<div class="move-notice" role="status" hidden>
+  <span class="move-notice-text"></span>
+  <button type="button" class="move-notice-undo" hidden>Undo</button>
+</div>
+
+<script>
+  import { requestMove } from "../archive/client";
+
+  // Shows "archived" notice after redirect from an entry page. Undo starts restore.
+  const notice = document.querySelector<HTMLElement>(".move-notice");
+  const path = new URLSearchParams(location.search).get("archived");
+  if (notice && path) {
+    const text = notice.querySelector<HTMLElement>(".move-notice-text")!;
+    const undo = notice.querySelector<HTMLButtonElement>(".move-notice-undo")!;
+    text.textContent = "Archived. Gone from site in ~2 min.";
+    undo.hidden = false;
+    notice.hidden = false;
+    history.replaceState(null, "", location.pathname);
+
+    undo.addEventListener("click", async () => {
+      undo.disabled = true;
+      const result = await requestMove("restore", path);
+      if (result.ok) {
+        text.textContent = "Restore queued. Back on site in ~2 min.";
+        undo.remove();
+      } else {
+        text.textContent = result.error;
+        undo.disabled = false;
+        undo.focus();
+      }
+    });
+  }
+</script>

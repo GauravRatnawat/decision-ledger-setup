@@ -1,0 +1,45 @@
+---
+interface Project {
+  commitCount: number;
+  lastActivity?: string;
+  name: string;
+  sessionCount: number;
+}
+
+interface Props {
+  active?: string;
+  projects: Project[];
+}
+
+const { active, projects } = Astro.props;
+const byActivity = [...projects].sort((a, b) =>
+  (b.lastActivity ?? "").localeCompare(a.lastActivity ?? ""),
+);
+---
+
+<aside class="project-rail" aria-label="Projects">
+  <a class="ledger-wordmark" href="/">
+    <span>DL</span>
+    <strong>Decision Ledger</strong>
+  </a>
+  <nav>
+    <p class="rail-label">Projects</p>
+    {
+      byActivity.map((project) => (
+        <a
+          aria-current={project.name === active ? "page" : undefined}
+          href={`/projects/${project.name}`}
+        >
+          <span>{project.name}</span>
+          <small>{project.sessionCount}</small>
+        </a>
+      ))
+    }
+  </nav>
+  <div class="rail-footer">
+    <a href="/projects">All projects</a>
+    <a href="/source/home">Source home</a>
+    <a href="/archives">Archived entries</a>
+    <span>Private · Cloudflare Access</span>
+  </div>
+</aside>

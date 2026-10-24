@@ -1,0 +1,26 @@
+---
+import { dateLabel, manifest } from "../lib/journal";
+import ArchiveControl from "./ArchiveControl.astro";
+
+interface Props {
+  route: string;
+}
+
+const { route } = Astro.props;
+const entry = manifest.entries.find((candidate) => candidate.route === route);
+---
+
+{
+  entry && (
+    <div class="entry-evidence">
+      <a href={`/projects/${entry.project}`}>{entry.project}</a>
+      <span>{entry.type.replace("-", " ")}</span>
+      <time>{dateLabel(entry.metadata.date)}</time>
+      {entry.metadata.model && <span>{entry.metadata.model}</span>}
+      {(entry.type === "session" || entry.type === "commit") && (
+        <ArchiveControl path={entry.sourcePath} project={entry.project} title={entry.title} />
+      )}
+      <small>{entry.sourcePath}</small>
+    </div>
+  )
+}

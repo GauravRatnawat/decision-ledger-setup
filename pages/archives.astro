@@ -1,0 +1,66 @@
+---
+import LedgerPage from "../src/components/LedgerPage.astro";
+import ProjectRail from "../src/components/ProjectRail.astro";
+import { dateLabel, manifest } from "../src/lib/journal";
+---
+
+<LedgerPage title="Archived entries · Decision Ledger" route="/archives">
+  <div class="ledger-shell">
+    <ProjectRail projects={manifest.projects} />
+    <main class="ledger-main inner-page">
+      <header class="index-hero">
+        <p class="eyebrow">Archive / {manifest.archives.length} entries</p>
+        <h1>Archived entries.</h1>
+        <p>Off the website, kept in <code>.archive/</code>. Restore returns an entry after the next deploy (~2 min).</p>
+      </header>
+      {
+        manifest.archives.length === 0 ? (
+          <p class="archive-empty">Nothing archived.</p>
+        ) : (
+          <div class="archive-list">
+            {manifest.archives.map((entry) => (
+              <div class="archive-row" data-path={entry.sourcePath}>
+                <span class="row-content">
+                  <span class="row-meta">
+                    <a href={`/projects/${entry.project}`}>{entry.project}</a>
+                    <span>{entry.type}</span>
+                    <time>{dateLabel(entry.date)}</time>
+                  </span>
+                  <strong>{entry.title}</strong>
+                  <small>{entry.sourcePath}</small>
+                </span>
+                <span class="archive-row-action">
+                  <button type="button" class="archive-restore">Restore</button>
+                  <span class="archive-row-status" role="status"></span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )
+      }
+    </main>
+  </div>
+</LedgerPage>
+
+<script>
+  import { requestMove } from "../src/archive/client";
+
+  for (const row of document.querySelectorAll<HTMLElement>(".archive-row")) {
+    const button = row.querySelector<HTMLButtonElement>(".archive-restore")!;
+    const status = row.querySelector<HTMLElement>(".archive-row-status")!;
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      button.textContent = "Restoring…";
+      const result = await requestMove("restore", row.dataset.path ?? "");
+      if (result.ok) {
+        button.remove();
+        status.textContent = "Restore queued. Back in ~2 min.";
+        return;
+      }
+      button.disabled = false;
+      button.textContent = "Restore";
+      status.textContent = result.error;
+      button.focus();
+    });
+  }
+</script>

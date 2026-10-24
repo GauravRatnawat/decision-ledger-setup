@@ -1,0 +1,62 @@
+---
+interface Props {
+  path: string;
+  project: string;
+  title: string;
+}
+
+const { path, project, title } = Astro.props;
+---
+
+<archive-control data-path={path} data-project={project}>
+  <button type="button" class="archive-trigger">Archive</button>
+  <dialog class="archive-dialog" aria-labelledby="archive-dialog-title">
+    <form method="dialog">
+      <p class="eyebrow">Archive entry</p>
+      <h2 id="archive-dialog-title">{title}</h2>
+      <p>Leaves the website after next deploy (~2 min). Markdown moves to <code>.archive/</code> and stays recoverable from Archived entries.</p>
+      <small>{path}</small>
+      <p class="archive-error" role="alert" hidden></p>
+      <div class="archive-actions">
+        <button value="cancel" class="archive-cancel">Cancel</button>
+        <button type="button" class="archive-confirm">Archive</button>
+      </div>
+    </form>
+  </dialog>
+</archive-control>
+
+<script>
+  import { requestMove } from "../archive/client";
+
+  class ArchiveControl extends HTMLElement {
+    connectedCallback() {
+      const dialog = this.querySelector("dialog")!;
+      const trigger = this.querySelector<HTMLButtonElement>(".archive-trigger")!;
+      const confirm = this.querySelector<HTMLButtonElement>(".archive-confirm")!;
+      const error = this.querySelector<HTMLElement>(".archive-error")!;
+      const { path = "", project = "" } = this.dataset;
+
+      trigger.addEventListener("click", () => {
+        error.hidden = true;
+        dialog.showModal();
+      });
+      dialog.addEventListener("close", () => trigger.focus());
+      confirm.addEventListener("click", async () => {
+        confirm.disabled = true;
+        confirm.textContent = "Archiving…";
+        const result = await requestMove("archive", path);
+        if (result.ok) {
+          location.assign(`/projects/${encodeURIComponent(project)}?archived=${encodeURIComponent(path)}`);
+          return;
+        }
+        confirm.disabled = false;
+        confirm.textContent = "Archive";
+        error.textContent = result.error;
+        error.hidden = false;
+        confirm.focus();
+      });
+    }
+  }
+
+  customElements.define("archive-control", ArchiveControl);
+</script>
