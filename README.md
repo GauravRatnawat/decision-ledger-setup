@@ -12,7 +12,7 @@ Use two repositories:
 
 | Repository | Visibility | Contents |
 | --- | --- | --- |
-| `decision-ledger-setup` | Private for now | Website code and setup templates. GitHub read access required. Code can be shared publicly later after review. |
+| `decision-ledger-setup` | Public | Website code and setup templates. Anyone can read or fork code. |
 | `my-journals` | **Private** | Your journals, website settings and deployment workflow. |
 
 Never make a repository containing real journal history public. Setup code can stay private too. For a private setup repository, each user needs GitHub read access. GitHub Actions also needs a separate token restricted to reading the setup repository; its default token cannot read another private repository. The starter workflow assumes public setup code and needs that authentication configured before deploying with private setup code.
@@ -72,7 +72,7 @@ Open `journal-site.json` in your private repository:
 
 Use your actual Cloudflare Pages project name for `pagesProject` and its URL for `siteUrl`. You can use a custom domain instead.
 
-The workflow template uses `master`. If your journal branch is `main`, open `.github/workflows/deploy.yml` and change both `branches: [master]` and `--branch master` to `main`. Keep these values and `journalBranch` consistent.
+The workflow template uses `master`. If your journal branch is `main`, open `.github/workflows/deploy.yml` and change `branches: [master]`, the job guard `refs/heads/master` and `--branch master` to `main`. Keep these values and `journalBranch` consistent.
 
 ## 4. Build and check locally
 
