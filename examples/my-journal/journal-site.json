@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/GauravRatnawat/decision-ledger-setup.git",
+  "revision": "e9173b9fc21d455288c5507de0080710396aef07",
+  "siteUrl": "https://my-journal.pages.dev",
+  "journalRepository": "YOUR_ACCOUNT/my-journal",
+  "journalBranch": "master",
+  "pagesProject": "my-journal"
+}
