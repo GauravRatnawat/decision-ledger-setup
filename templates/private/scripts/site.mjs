@@ -61,6 +61,11 @@ function git(...args) {
   }
 }
 
+function hasChangedSource() {
+  return git('status', '--porcelain', '--untracked-files=all')
+    || git('ls-files', '-v').split('\n').some((line) => line && !line.startsWith('H '));
+}
+
 const command = process.argv[2];
 if (!['prepare', 'install', 'test', 'check', 'build'].includes(command) || process.argv.length !== 3) {
   stop('Use node scripts/site.mjs prepare|install|test|check|build.');
@@ -78,7 +83,7 @@ if (command === 'prepare') {
   git('init');
   git('fetch', '--no-tags', config.repository, config.revision);
   git('checkout', '--detach', config.revision);
-  if (git('rev-parse', 'HEAD') !== config.revision || git('status', '--porcelain', '--untracked-files=no')) {
+  if (git('rev-parse', 'HEAD') !== config.revision || hasChangedSource()) {
     stop('Setup checkout needs exact clean pin.');
   }
   writeFileSync(proof, identity);
@@ -91,7 +96,7 @@ if (command === 'prepare') {
   }
   if (prepared !== identity) stop('Setup pin changed. Run prepare first.');
   if (git('rev-parse', 'HEAD') !== config.revision || git('rev-parse', '--abbrev-ref', 'HEAD') !== 'HEAD'
-    || git('status', '--porcelain', '--untracked-files=no')) {
+    || hasChangedSource()) {
     stop('Setup checkout needs exact clean pin. Run prepare first.');
   }
   try {

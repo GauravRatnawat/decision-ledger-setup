@@ -79,6 +79,25 @@ function fails(result, message) {
   assert.match(result.stderr, message);
 }
 
+test('untracked pnpm hook blocks install before pnpm runs', (t) => {
+  const f = fixture(t);
+  const pnpm = fakePnpm(f);
+  succeeds(f.run('prepare'));
+  writeFileSync(path.join(f.setup, '.pnpmfile.cjs'), 'module.exports = {};');
+  fails(f.run('install', pnpm.env), /clean pin/i);
+  assert.equal(existsSync(pnpm.log), false);
+});
+
+test('assume unchanged flag cannot hide modified pinned source', (t) => {
+  const f = fixture(t);
+  const pnpm = fakePnpm(f);
+  succeeds(f.run('prepare'));
+  git(f.setup, 'update-index', '--assume-unchanged', 'version.txt');
+  writeFileSync(path.join(f.setup, 'version.txt'), 'modified pinned code');
+  fails(f.run('build', pnpm.env), /clean pin/i);
+  assert.equal(existsSync(pnpm.log), false);
+});
+
 test('git env from caller cannot aim checkout at private root', (t) => {
   const f = fixture(t);
   git(f.root, 'init', '--initial-branch=master');
