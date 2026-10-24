@@ -2,7 +2,7 @@
 
 Copy this folder into NEW PRIVATE repo. Keep repo private for life. Never publish old journal history.
 
-Fill `journal-site.json`: public setup Git URL, full commit SHA, private site URL, private journal repo, branch and Pages project. No secrets in JSON.
+Fill `journal-site.json`: setup HTTPS Git URL, full commit SHA, private site URL, private journal repo, branch and Pages project. No secrets in JSON. Setup repo can stay private. Local Git needs read access; CI needs separate token with Contents read only on setup repo. Default Actions token cannot read another private repo. Configure fetch authentication before deploy.
 
 ```sh
 node --test tests/site.test.mjs
