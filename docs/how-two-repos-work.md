@@ -73,6 +73,8 @@ Archive code comes from public setup. Write token and target repo settings stay 
 
 ## Start your own
 
-Follow [README setup steps](../README.md). Copy [private starter](../templates/private/) once, keep journal repo private, and choose setup commit deliberately.
+For small repo with bootstrap inside deploy YAML, copy [demo journal repo](../examples/my-journal/). No separate scripts or tests folder needed. Inline workflow fetches and checks exact setup pin, then tests and builds. Data flow above stays same.
+
+For separate runner with local command support, follow [README setup steps](../README.md) and copy [private starter](../templates/private/). Keep journal repo private and choose setup commit deliberately.
 
 Diagram files: [Mermaid source](diagrams/two-repo-flow.mmd), [SVG](diagrams/two-repo-flow.svg), [PNG](diagrams/two-repo-flow.png), [editable scene](diagrams/two-repo-flow.excalidraw).

@@ -27,18 +27,62 @@ jobs:
         uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: 22.12.0
-      - name: Test runner
-        run: node --test tests/site.test.mjs
-      - name: Get exact setup pin
-        run: node scripts/site.mjs prepare
-      - name: Install deps
-        run: node scripts/site.mjs install
-      - name: Test setup
-        run: node scripts/site.mjs test
-      - name: Check site
-        run: node scripts/site.mjs check
-      - name: Build site
-        run: node scripts/site.mjs build
+      - name: Build pinned setup
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+          import path from 'node:path';
+
+          const root = process.cwd();
+          const setup = path.join(root, '.site/setup');
+          const config = JSON.parse(readFileSync('journal-site.json', 'utf8'));
+          const check = (ok, message) => { if (!ok) throw new Error(message); };
+          const hasText = value => typeof value === 'string' && value.trim().length > 0;
+          check(config && typeof config === 'object' && !Array.isArray(config), 'Site config needs object.');
+          check(typeof config.revision === 'string' && /^[a-f0-9]{40}$/.test(config.revision), 'Site revision needs 40 lowercase hex chars.');
+          check(hasText(config.repository) && (path.isAbsolute(config.repository) || /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(?:\.git)?$/.test(config.repository)), 'Site repository needs full local path or HTTPS GitHub URL.');
+          check(hasText(config.siteUrl), 'Site URL missing.');
+          const url = new URL(config.siteUrl);
+          check(!url.username && !url.password && (url.protocol === 'https:' || (url.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname))), 'Site needs HTTPS URL or HTTP localhost.');
+          check(typeof config.journalRepository === 'string' && /^[\w-]+\/[\w.-]+$/.test(config.journalRepository), 'Journal repo needs owner/repo.');
+          check(hasText(config.journalBranch) && !config.journalBranch.startsWith('-'), 'Journal branch missing or bad.');
+          check(hasText(config.pagesProject), 'Pages project missing.');
+          // Fresh checkout only. Keep old output intact on local rerun.
+          check(!existsSync(path.join(root, '.site')), 'Site folder exists. Use fresh journal checkout.');
+          mkdirSync(setup, { recursive: true });
+          const gitEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));
+          const git = (...args) => execFileSync('git', args, {
+            cwd: setup, env: gitEnv, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+          }).trim();
+          const verify = () => {
+            check(git('rev-parse', 'HEAD') === config.revision, 'Setup needs exact pin.');
+            check(git('rev-parse', '--abbrev-ref', 'HEAD') === 'HEAD', 'Setup needs detached checkout.');
+            check(!git('status', '--porcelain', '--untracked-files=all') && git('ls-files', '-v').split('\n').every(line => !line || line.startsWith('H ')), 'Setup needs clean pin.');
+          };
+          try {
+            git('init');
+            git('fetch', '--no-tags', config.repository, config.revision);
+            git('checkout', '--detach', config.revision);
+          } catch {
+            throw new Error('Setup fetch failed. Check repository and full commit SHA.');
+          }
+          for (const args of [['install', '--frozen-lockfile'], ['run', 'test'], ['run', 'check'], ['run', 'build']]) {
+            verify();
+            execFileSync('pnpm', args, {
+              cwd: setup, stdio: 'inherit',
+              env: {
+                ...process.env,
+                JOURNAL_ROOT: root,
+                JOURNAL_SITE_URL: config.siteUrl,
+                JOURNAL_REPOSITORY: config.journalRepository,
+                JOURNAL_BRANCH: config.journalBranch,
+              },
+            });
+          }
+          verify();
+          NODE
       - name: Deploy site and Functions
         working-directory: .site/setup
         env:

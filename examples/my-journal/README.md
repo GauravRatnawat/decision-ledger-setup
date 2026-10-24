@@ -9,8 +9,6 @@ my-journal/
   .github/workflows/deploy.yml    GitHub Actions deploy
   .gitignore                      Keep builds and secrets out
   journal-site.json               Site settings and setup pin
-  scripts/site.mjs                Fetch setup and run build
-  tests/site.test.mjs             Check runner
   HOME.md                        Ledger home notes
   example/
     INDEX.md                     Project entry links
@@ -22,7 +20,7 @@ my-journal/
       2026-01-03_09-00_old-note.md Archived sample, body excluded from site
 ```
 
-No renderer or package.json needed here. Runner fetches setup code into ignored `.site/setup`. Setup owns deps, styles, pages and Functions.
+No scripts folder, tests folder, renderer or package.json needed here. Deploy YAML holds bootstrap code. It fetches exact setup commit into ignored `.site/setup`, checks pin, then installs deps, tests and builds. Setup owns deps, styles, pages and Functions.
 
 ## Copy into own private repo
 
@@ -36,16 +34,9 @@ Command includes hidden `.github`, `.gitignore` and `.archive` files. Run only i
 
 Open `journal-site.json`. Replace `YOUR_ACCOUNT`, website URL and Pages project name. Demo pins known setup commit; choose reviewed full commit SHA when upgrading. No secrets in JSON.
 
-Need Node 22.12+ and pnpm 10.34.5. Run from private repo:
+GitHub Actions sets Node 22.12.0 and pnpm 10.34.5. Push private production branch, then watch Actions tab. No local script needed.
 
-```sh
-node --test tests/site.test.mjs
-node scripts/site.mjs prepare
-node scripts/site.mjs install
-node scripts/site.mjs test
-node scripts/site.mjs check
-node scripts/site.mjs build
-```
+For local check, use Node 22.12+ and pnpm 10.34.5. Copy shell block from workflow's **Build pinned setup** step into terminal at fresh private repo root. It runs same fetch, tests and build without deploying. Use fresh checkout for each run; bootstrap rejects existing `.site/` rather than changing old output.
 
 Build output stays in ignored `.site/setup/dist`. Markdown source stays unchanged. Replace fake entries with own notes in PRIVATE repo only. Do not put real notes into public example folder.
 

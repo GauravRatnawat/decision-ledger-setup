@@ -19,7 +19,7 @@ Never make a repository containing real journal history public. Setup code can s
 
 Read [how two repos work](docs/how-two-repos-work.md) for diagram, build flow, privacy and upgrades.
 
-See [demo private journal repo](examples/my-journal/) for full folder layout, fake entries, config, runner and deploy workflow. Copy only into new private repo.
+See [demo private journal repo](examples/my-journal/) for small repo layout, fake entries and config. Its deploy YAML holds bootstrap code, so no scripts or tests folder needed in journal repo. Copy only into new private repo. Main guide below uses separate runner from `templates/private`.
 
 See [demo setup workflow](examples/setup.yml) for deploy YAML with notes. Copy it into your **private journal repo** at `.github/workflows/deploy.yml` after copying starter files.
 

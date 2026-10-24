@@ -26,6 +26,8 @@ jobs:
         run: pnpm test
       - name: Test private runner template
         run: node --test templates/private/tests/site.test.mjs
+      - name: Test demo workflow
+        run: node --test tests/demo-workflow.test.mjs
       - name: Check fake site
         run: pnpm check
       - name: Build fake site
