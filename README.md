@@ -17,6 +17,8 @@ Use two repositories:
 
 Never make a repository containing real journal history public. Setup code can stay private too. For a private setup repository, each user needs GitHub read access. GitHub Actions also needs a separate token restricted to reading the setup repository; its default token cannot read another private repository. The starter workflow assumes public setup code and needs that authentication configured before deploying with private setup code.
 
+Read [how two repos work](docs/how-two-repos-work.md) for diagram, build flow, privacy and upgrades.
+
 See [demo setup workflow](examples/setup.yml) for deploy YAML with notes. Copy it into your **private journal repo** at `.github/workflows/deploy.yml` after copying starter files.
 
 ## 1. Get the setup code

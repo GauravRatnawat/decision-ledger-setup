@@ -1,0 +1,17 @@
+flowchart TD
+    S["Public setup repo<br/>Site code, tests, templates"]
+    J["Private journal repo<br/>Markdown, config, deploy workflow"]
+    P["journal-site.json<br/>Setup URL and exact commit SHA"]
+    B["Private GitHub Actions build<br/>Ignored .site/setup checkout"]
+    O["Generated site and search index<br/>.site/setup/dist"]
+    C["Cloudflare Pages<br/>Static site and Functions"]
+    A["Cloudflare Access<br/>Owner login required"]
+    U["Owner reads journal site"]
+    J --> P
+    P -->|Choose code version| B
+    S -->|Fetch pinned commit| B
+    J -->|Read journals| B
+    B -->|Test and build| O
+    O -->|Deploy with setup Functions| C
+    C -->|Requests pass through login| A
+    A --> U
