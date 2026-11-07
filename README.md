@@ -4,6 +4,10 @@ Build your own searchable journal website using your GitHub and Cloudflare accou
 
 You choose the setup version, journal repository, branch, website URL and Cloudflare project. No original author's account or domain is required.
 
+Full flow from recorder to private GitHub repo and protected website: [end to end setup guide](docs/end-to-end-setup.md). Includes existing site upgrade path.
+
+Public knowledge base page code lives in [site/](site/). Own build and deploy workflow, separate from setup renderer and private site.
+
 ## Before you start
 
 You need Git, Node.js 22.12 or newer, pnpm 10.34.5, a GitHub account and a Cloudflare account.

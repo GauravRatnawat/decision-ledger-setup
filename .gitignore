@@ -6,6 +6,9 @@ coverage/
 .wrangler/
 .gstack/
 .site/
+.public-site/
+.public-site-cache/
+site/.astro/
 .env
 .env.*
 .dev.vars

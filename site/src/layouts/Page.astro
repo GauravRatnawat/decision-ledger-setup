@@ -1,0 +1,43 @@
+---
+import '../styles/site.css';
+interface Props { title: string; description: string; }
+const { title, description } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = `${base}/`;
+const guide = `${base}/guide/`;
+const demo = `${base}/demo/`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f5f0e8" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231a1814'/%3E%3Cpath d='M19 16v32h26M27 21h18M27 30h18M27 39h11' stroke='%23ff7a1a' stroke-width='4' fill='none'/%3E%3C/svg%3E" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="header">
+      <div class="wrap header-inner">
+        <a class="brand" href={home}><span class="brand-mark" aria-hidden="true">L.</span> Decision Ledger <span class="brand-sub">Setup</span></a>
+        <nav aria-label="Main">
+          <a href={guide} aria-current={Astro.url.pathname === guide ? 'page' : undefined}>Guide</a>
+          <a href={demo} aria-current={Astro.url.pathname === demo ? 'page' : undefined}>Demo</a>
+          <a href="https://github.com/GauravRatnawat/decision-ledger-setup">GitHub <span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+    <slot />
+    <footer class="footer wrap">
+      <div><a class="footer-name" href={home}>Decision Ledger Setup</a><p>Public code. Private notes. Your own accounts.</p></div>
+      <div class="footer-links"><a href={guide}>Setup guide</a><a href="https://gauravratnawat.com/journal-recorder-agent/">Journal Recorder</a><a href="https://github.com/GauravRatnawat/decision-ledger-setup">Source code</a></div>
+    </footer>
+  </body>
+</html>

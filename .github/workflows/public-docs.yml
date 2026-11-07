@@ -1,0 +1,53 @@
+name: Public knowledge base
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'docs/end-to-end-setup.md', '.github/workflows/public-docs.yml']
+  pull_request:
+    paths: ['site/**', 'docs/end-to-end-setup.md', '.github/workflows/public-docs.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: public-docs-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Get public source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - name: Set pnpm
+        uses: pnpm/action-setup@a8198c4bff370c8506180b035930dea56dbd5288
+        with:
+          version: 10.34.5
+          run_install: false
+      - name: Set Node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 22.12.0
+      - name: Install knowledge base deps
+        run: pnpm --dir site install --frozen-lockfile --ignore-scripts
+      - name: Test public site
+        run: pnpm --dir site test
+      - name: Build public site
+        run: pnpm --dir site build
+      - name: Upload public pages only
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
+        with:
+          path: .public-site
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy public knowledge base
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e

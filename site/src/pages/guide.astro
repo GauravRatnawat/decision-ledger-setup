@@ -1,0 +1,14 @@
+---
+import Page from '../layouts/Page.astro';
+import { Content, getHeadings } from '../../../docs/end-to-end-setup.md';
+const headings = getHeadings().filter(heading => heading.depth === 2);
+---
+<Page title="Setup Guide | Decision Ledger" description="Full setup from Journal Recorder through private GitHub repo to protected Cloudflare journal website.">
+  <main id="main" class="wrap">
+    <div class="page-intro"><h1>Your notes.<br />Your own site.</h1><p>Start with fake content. Check privacy. Then connect recorder and follow first note all way to site.</p></div>
+    <div class="docs-layout">
+      <aside class="docs-nav" aria-label="Guide sections"><p>On this page</p>{headings.map(heading => <a href={`#${heading.slug}`}>{heading.text}</a>)}</aside>
+      <article class="prose"><Content /></article>
+    </div>
+  </main>
+</Page>

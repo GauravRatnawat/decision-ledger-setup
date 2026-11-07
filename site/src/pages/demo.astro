@@ -1,0 +1,25 @@
+---
+import Page from '../layouts/Page.astro';
+const guide = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/guide/`;
+---
+<Page title="Sample Journal | Decision Ledger" description="Fake journal sample. See how choices, reasons and next steps fit in private Markdown journal.">
+  <main id="main" class="wrap">
+    <div class="page-intro"><h1>Notes with<br />reasons attached.</h1><p>Fake sample below shows journal shape. Real site adds search and project navigation from your own Markdown.</p></div>
+    <div class="demo-shell">
+      <div class="demo-toolbar"><span>Decision Ledger / sample</span><span class="status">Fake content only</span></div>
+      <div class="demo-grid">
+        <aside class="demo-sidebar" aria-label="Sample note sections"><p>search-service</p><a href="#choice">Choice</a><a href="#reason">Reason</a><a href="#next">Next step</a></aside>
+        <article class="demo-entry">
+          <p class="tags">#decisions &nbsp; #search</p><h2>Keep search close to notes.</h2>
+          <p>Nov 07, 2026 · search-service</p>
+          <h3 id="choice">Choice</h3><p>Build search index with journal site. Keep one deploy for pages and search data.</p>
+          <h3 id="reason">Reason</h3><p>Notes small. Static search meets current need. No separate server, database or account to maintain.</p>
+          <h3 id="next">Next step</h3><p>Check results after next deploy. Add new search service only if note volume calls for it.</p>
+          <hr /><p>Source stays plain Markdown in private repo. Site build reads it, keeps source intact.</p>
+        </article>
+      </div>
+      <p class="demo-caption">Static sample view. No real journal data, login or archive writes on this public page.</p>
+    </div>
+    <section class="section start"><div><h2>Make it yours.</h2><p>Start with fake demo repo, protect site, then save own notes.</p></div><a class="button" href={guide}>Set up your site</a></section>
+  </main>
+</Page>

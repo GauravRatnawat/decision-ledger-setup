@@ -2,6 +2,8 @@
 
 Public repo holds reusable site code. Private repo holds your journals and picks which code version to run. Private build combines both, then deploys site behind Cloudflare Access.
 
+For recorder install through first private site deploy, use [end to end setup guide](end-to-end-setup.md).
+
 ## Build flow
 
 ```mermaid
