@@ -83,11 +83,9 @@ No tokens in JSON. `.site/`, secrets and generated output stay ignored. Real Mar
 
 ## 4. Set privacy and first deploy
 
-Follow [Cloudflare privacy and deployment steps](https://github.com/GauravRatnawat/decision-ledger-setup/blob/main/README.md#5-set-up-cloudflare-privacy-and-deployment):
-
-1. Create Pages **Direct Upload** project with name from config.
-2. Set Cloudflare Access policy for allowed reader email. Cover production Pages hostname, preview and deployment hosts, plus custom domain if used. Use fake content while checking protection.
-3. Add `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` to private repo Actions secrets. Token needs Cloudflare Pages Edit for own account.
+1. Create Cloudflare Pages **Direct Upload** project with `pagesProject` name from config. Use private repo Actions for deploy, with no second Git build.
+2. In Cloudflare Zero Trust, set Access policy for allowed reader email. Cover production Pages hostname, preview and deployment hosts, plus custom domain if used. Use fake content while checking protection. Headers alone do not guard site.
+3. Find Cloudflare account ID. Create API token with **Account → Cloudflare Pages → Edit** for own account. In private repo **Settings → Secrets and variables → Actions**, add `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`. No tokens in JSON or public repo.
 4. Commit starter and push `master`:
 
 ```sh
