@@ -23,66 +23,25 @@ Never make a repository containing real journal history public. Setup code can s
 
 Read [how two repos work](docs/how-two-repos-work.md) for diagram, build flow, privacy and upgrades.
 
-See [demo private journal repo](examples/my-journal/) for small repo layout, fake entries and config. Its deploy YAML holds bootstrap code, so no scripts or tests folder needed in journal repo. Copy only into new private repo. Main guide below uses separate runner from `templates/private`.
+See [demo private journal repo](examples/my-journal/) for small repo layout, fake entries and config. Its deploy YAML holds bootstrap code. Copy only into new private repo. [Local runner steps below](#local-runner-starter) use `templates/private`.
 
 See [demo setup workflow](examples/setup.yml) for deploy YAML with notes. Copy it into your **private journal repo** at `.github/workflows/deploy.yml` after copying starter files.
 
-## 1. Get the setup code
+## Local runner starter
 
-Fork the published setup repository into your GitHub account if you want to maintain your own copy. Otherwise, use the published repository directly.
+Use [setup guide steps 1 through 3](docs/end-to-end-setup.md#1-get-starter-code) for clone, private repo, branch and config. Fork setup repo if you want own code copy. Use own fork URL when cloning and in config.
 
-Replace `SETUP_OWNER` below with the account hosting that repository:
-
-```sh
-git clone https://github.com/SETUP_OWNER/decision-ledger-setup.git
-cd decision-ledger-setup
-git rev-parse HEAD
-cd ..
-```
-
-Save the full 40-character commit ID printed above. It locks your site to that version, so later code updates cannot change your site unexpectedly.
-
-## 2. Create your private journal repository
-
-On GitHub, create an empty repository named `my-journals` and choose **Private**. Replace `YOUR_ACCOUNT` with your GitHub username:
+For local runner, replace guide's demo copy command with these commands from new empty private clone:
 
 ```sh
-git clone https://github.com/YOUR_ACCOUNT/my-journals.git
-cd my-journals
 cp -R ../decision-ledger-setup/templates/private/. .
+cp -R ../decision-ledger-setup/examples/journals/. .
+git -C ../decision-ledger-setup rev-parse HEAD
 ```
 
-The copy command includes hidden files such as `.github/` and `.gitignore`. Use it in the new, empty repository.
+Copy includes hidden `.github/` and `.gitignore`. Set `revision` to full commit ID printed above. Fill template's other config fields from guide. Start with fake notes. Local runner uses `master` too. If using `main`, change workflow push branch, job ref guard, deploy branch and `journalBranch` together.
 
-Add your Markdown journals using this layout:
-
-```text
-HOME.md
-my-project/
-  INDEX.md
-  2026-01-01_10-00_first-decision.md
-```
-
-Copy the examples from `decision-ledger-setup/examples/journals/` if you want a starting point. Write journals yourself or use your existing recorder. This setup does not install recording hooks.
-
-## 3. Fill in your settings
-
-Open `journal-site.json` in your private repository:
-
-```json
-{
-  "repository": "https://github.com/SETUP_OWNER/decision-ledger-setup.git",
-  "revision": "PASTE_THE_FULL_COMMIT_ID_FROM_STEP_1",
-  "siteUrl": "https://my-journal.pages.dev",
-  "journalRepository": "YOUR_ACCOUNT/my-journals",
-  "journalBranch": "main",
-  "pagesProject": "my-journal"
-}
-```
-
-Use your actual Cloudflare Pages project name for `pagesProject` and its URL for `siteUrl`. You can use a custom domain instead.
-
-The workflow template uses `master`. If your journal branch is `main`, open `.github/workflows/deploy.yml` and change `branches: [master]`, the job guard `refs/heads/master` and `--branch master` to `main`. Keep these values and `journalBranch` consistent.
+Runner adds local site commands. Recorder install stays in [guide step 5](docs/end-to-end-setup.md#5-install-recorder-with-git-sync).
 
 ## 4. Build and check locally
 
@@ -110,17 +69,7 @@ The build reads your journals without changing them. Downloaded code and generat
 
 ## 5. Set up Cloudflare privacy and deployment
 
-1. Create a Cloudflare Pages **Direct Upload** project with the name from `pagesProject`. Use GitHub Actions below for deployments, rather than a second Git-connected build.
-2. In Cloudflare Zero Trust, configure Access to allow only your email. Protect the production `pages.dev` address, preview addresses and any custom domain **before uploading real journals**. Confirm a signed-out visitor must log in. Privacy headers alone do not protect the site.
-3. Find your Cloudflare account ID and create an API token with **Account → Cloudflare Pages → Edit** permission for that account.
-4. In your **private GitHub repository**, open **Settings → Secrets and variables → Actions**. Add these repository secrets:
-
-   | Secret | Value |
-   | --- | --- |
-   | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID |
-   | `CLOUDFLARE_API_TOKEN` | Your Cloudflare Pages deployment token |
-
-Never put tokens in `journal-site.json` or the public setup repository.
+Follow [guide step 4](docs/end-to-end-setup.md#4-set-privacy-and-first-deploy) for Pages project, Access protection and deploy secrets. Check every host with fake notes before real upload. No tokens in JSON or public repo.
 
 ## 6. Push your private repository
 
@@ -129,7 +78,7 @@ From your private repository, using your actual branch name:
 ```sh
 git add .
 git commit -m "Set up private journal site"
-git push -u origin main
+git push -u origin master
 ```
 
 Open the repository's **Actions** tab and watch **Deploy private ledger**. It fetches your pinned setup version, tests and builds your journals, then deploys the site and its Functions together.
