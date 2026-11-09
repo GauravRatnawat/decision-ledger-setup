@@ -26,7 +26,7 @@ export function normalizeJournalEntry({
   sourcePath,
 }: NormalizeJournalEntryInput): JournalEntry {
   const parseableMarkdown = markdown.replace(
-    /^(title:\s*)(?!["'])(.+)$/m,
+    /^(title:[ \t]*)(?!["'\s])(.+)$/m,
     (_match, prefix: string, value: string) =>
       `${prefix}${JSON.stringify(value.trim())}`,
   );

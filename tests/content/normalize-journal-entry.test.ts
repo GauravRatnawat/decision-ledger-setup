@@ -3,6 +3,24 @@ import { describe, expect, it } from "vitest";
 import { normalizeJournalEntry } from "../../src/content/normalize-journal-entry";
 
 describe("normalizeJournalEntry", () => {
+  it.each([
+    ['title: "Keep quoted title: safely"', "Keep quoted title: safely"],
+    ["title: 'Keep single quotes: safely'", "Keep single quotes: safely"],
+    ['title:   "Keep extra spaces"', "Keep extra spaces"],
+    ['title:\t"Keep tab spacing"', "Keep tab spacing"],
+    ["title: Keep bare title: safely", "Keep bare title: safely"],
+    ["title:\nproject: example", undefined],
+  ])("preserves valid title frontmatter: %s", (titleLine, title) => {
+    const entry = normalizeJournalEntry({
+      markdown: `---\n${titleLine}\ndate: 2026-01-01\n---\n\n# Heading fallback\n`,
+      sourcePath: "example/2026-01-01_entry.md",
+    });
+
+    expect(entry.title).toBe(title ?? "Heading fallback");
+    expect(entry.metadata.date).toBe("2026-01-01");
+    expect(entry.project).toBe("example");
+  });
+
   it("prefers the frontmatter title", () => {
     const entry = normalizeJournalEntry({
       markdown: `---
